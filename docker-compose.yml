@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   imgbed:
-    image: marseventh/cloudflare-imgbed:latest
+    build: .
     ports:
-      - "7658:8080"
+      - "7658:7860"
     volumes:
-      - ./data:/app/data
+      - ./data:/data
     restart: unless-stopped
