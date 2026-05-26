@@ -181,7 +181,47 @@
 
 </details>
 
-# 4. Tips
+# 4. 部署到 Hugging Face Spaces (Docker)
+
+本项目可部署到 Hugging Face Spaces 的 Docker 运行环境中，适合需要托管大文件、不受 Cloudflare Worker 10ms CPU 限制的用户。
+
+## 步骤
+
+1. **Fork 本仓库** 到你的 GitHub 账户。
+
+2. **在 [Hugging Face Spaces](https://huggingface.co/spaces) 创建新 Space**：
+   - 选择 **Docker** 作为 Space SDK（`README.md` 已包含所需的 YAML 头部信息）。
+   - 设置 **Space storage** 为**持久化卷**（例如 50GB），挂载到 `/data`。
+
+3. **使用 `huggingface-hub` 推送代码**（git-push 可能被二进制文件 pre-receive 钩子拦截）：
+   ```bash
+   pip install huggingface-hub
+   huggingface-cli login
+   python -c "
+   from huggingface_hub import upload_folder
+   upload_folder(
+       repo_type='space',
+       repo_id='你的用户名/你的Space名称',
+       folder_path='.',
+       ignore_patterns=['.git*', 'readme/*.png', 'readme/*.jpg', '*.map']
+   )
+   "
+   ```
+
+4. **在 Space 设置中配置环境变量**（如 `DATA_DIR=/data`，已默认配置）。
+
+5. **构建并运行**：Space 将自动构建，在 **Factory** 标签页查看构建日志。
+
+## 环境变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `PORT` | `7860` | HF Space 要求应用监听此端口 |
+| `DATA_DIR` | `/data` | 持久化存储路径（将卷挂载至此目录） |
+
+> **说明**：Dockerfile 已为 HF Spaces 预配置——使用 `node:22-slim`，以非 root 用户 `node`（UID 1000）运行，监听 `PORT`，数据存储在 `DATA_DIR`。
+
+# 5. Tips
 
 - **前端开源**：参见[MarSeventh/Sanyue-ImgHub](https://github.com/MarSeventh/Sanyue-ImgHub)项目。
 
@@ -202,13 +242,13 @@
 
   [![Contributors](https://contrib.rocks/image?repo=Marseventh/Cloudflare-ImgBed)](https://github.com/MarSeventh/CloudFlare-ImgBed/graphs/contributors)
 
-# 5. Star History
+# 6. Star History
 
 **如果觉得项目不错希望您能给个免费的star✨✨✨，非常感谢！**
 
 [![Star History Chart](https://api.star-history.com/svg?repos=MarSeventh/CloudFlare-ImgBed,MarSeventh/Sanyue-ImgHub&type=Date)](https://star-history.com/#MarSeventh/CloudFlare-ImgBed&MarSeventh/Sanyue-ImgHub&Date)
 
-# 6. Special Sponsors
+# 7. Special Sponsors
 
 - **[CloudFlare](https://www.cloudflare.com) & [EdgeOne](https://edgeone.ai/?from=github)**：提供CDN加速和安全保护服务
 

@@ -184,7 +184,47 @@ Provides detailed deployment documentation, feature docs, development plans, upd
 
 </details>
 
-# 4. Tips
+# 4. Deploy on Hugging Face Spaces (Docker)
+
+This project can be deployed on Hugging Face Spaces using the Docker SDK, suitable for users who need to host large files without the Cloudflare Worker 10ms CPU limit.
+
+## Steps
+
+1. **Fork this repo** to your GitHub account.
+
+2. **Create a new Space** on [Hugging Face Spaces](https://huggingface.co/spaces):
+   - Choose **Docker** as the Space SDK (the `README.md` already contains the required YAML front matter).
+   - Set **Space storage** to a **persistent volume** (e.g., 50GB) mounted at `/data`.
+
+3. **Push code using `huggingface-hub`** (git-push may be blocked by binary file pre-receive hooks):
+   ```bash
+   pip install huggingface-hub
+   huggingface-cli login
+   python -c "
+   from huggingface_hub import upload_folder
+   upload_folder(
+       repo_type='space',
+       repo_id='your-username/your-space-name',
+       folder_path='.',
+       ignore_patterns=['.git*', 'readme/*.png', 'readme/*.jpg', '*.map']
+   )
+   "
+   ```
+
+4. **Set environment variables** in your Space settings (e.g., `DATA_DIR=/data` if already configured).
+
+5. **Build & Run**: The Space will automatically build. Monitor logs in the **Factory** tab.
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `7860` | HF Space expects the app to listen on this port |
+| `DATA_DIR` | `/data` | Persistent storage path (mount your volume here) |
+
+> **Note**: The Dockerfile is pre-configured for HF Spaces — it uses `node:22-slim`, runs as non-root user `node` (UID 1000), listens on `PORT`, and stores data in `DATA_DIR`.
+
+# 5. Tips
 
 - Frontend is open source, see [MarSeventh/Sanyue-ImgHub](https://github.com/MarSeventh/Sanyue-ImgHub).
 
@@ -204,13 +244,13 @@ Provides detailed deployment documentation, feature docs, development plans, upd
 
   [![Contributors](https://contrib.rocks/image?repo=Marseventh/Cloudflare-ImgBed)](https://github.com/MarSeventh/CloudFlare-ImgBed/graphs/contributors)
 
-# 5. Star History
+# 6. Star History
 
 **If you like the project, please give a free star✨✨✨, thank you very much!**
 
 [![Star History Chart](https://api.star-history.com/svg?repos=MarSeventh/CloudFlare-ImgBed,MarSeventh/Sanyue-ImgHub&type=Date)](https://star-history.com/#MarSeventh/CloudFlare-ImgBed&MarSeventh/Sanyue-ImgHub&Date)
 
-# 6. Special Sponsors
+# 7. Special Sponsors
 
 - **[CloudFlare](https://www.cloudflare.com/) & [EdgeOne](https://edgeone.ai/?from=github)**：Provides CDN acceleration, and security protection
 
